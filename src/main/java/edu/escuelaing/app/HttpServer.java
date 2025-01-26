@@ -2,6 +2,7 @@ package edu.escuelaing.app;
 
 import java.net.*;
 import java.io.*;
+
 public class HttpServer {
     public static void main(String[] args) throws IOException, URISyntaxException {
         ServerSocket serverSocket = null;
@@ -11,6 +12,7 @@ public class HttpServer {
             System.err.println("Could not listen on port: 35000.");
             System.exit(1);
         }
+
         boolean running = true;
         while (running) {
             Socket clientSocket = null;
@@ -21,7 +23,7 @@ public class HttpServer {
                 System.err.println("Accept failed.");
                 System.exit(1);
             }
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            OutputStream out = clientSocket.getOutputStream();
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
                             clientSocket.getInputStream()));
@@ -41,31 +43,90 @@ public class HttpServer {
                     break;
                 }
             }
-            URI requetedFile = new URI(file);
+            URI requestedFile = new URI(file);
 
-            System.out.println("file: " + requetedFile);
+            System.out.println("file: " + requestedFile);
 
-            if(requetedFile.getPath().startsWith("/app/hello")){
-                outputLine = helloRestService(requetedFile.getPath(), requetedFile.getQuery());
-                out.println(outputLine);
-                //
-            } else {
+            // Si se solicita una imagen
+            if(requestedFile.getPath().endsWith(".png")){
+                File imgFile = new File("src/main/resources/image.png");
+                if(imgFile.exists()) {
+                    outputLine = "HTTP/1.1 200 OK\r\n"
+                            + "Content-Type: image/png\r\n"  // Para image/png
+                            + "\r\n";
+                    out.write(outputLine.getBytes());
 
+                    FileInputStream imgInputStream = new FileInputStream(imgFile);
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = imgInputStream.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
+                    }
+                    imgInputStream.close();
+                } else {
+                    outputLine = "HTTP/1.1 404 Not Found\r\n"
+                            + "Content-Type: text/html\r\n"
+                            + "\r\n"
+                            + "<html><body><h1>Image Not Found</h1></body></html>";
+                    out.write(outputLine.getBytes());
+                }
+            }
+            else {
                 outputLine = "HTTP/1.1 200 OK\r\n"
                         + "Content-Type: text/html\r\n" +
                         "\r\n" +
                         "<!DOCTYPE html>"
                         + "<html>"
                         + "<head>"
-                        + "<meta charset=\"UTF-8\">"
-                        + "<title>Title of the document</title>\n"
+                        + "    <title>Form Example</title>"
+                        + "    <meta charset=\"UTF-8\">"
+                        + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
                         + "</head>"
                         + "<body>"
-                        + "My Web Site"
+                        + "    <h1>Form with GET</h1>"
+                        + "    <form action=\"/hello\">"
+                        + "        <label for=\"name\">Name:</label><br>"
+                        + "        <input type=\"text\" id=\"name\" name=\"name\" value=\"John\"><br><br>"
+                        + "        <input type=\"button\" value=\"Submit\" onclick=\"loadGetMsg()\">"
+                        + "    </form> "
+                        + "    <div id=\"getrespmsg\"></div>"
+                        + ""
+                        + "    <script>"
+                        + "        function loadGetMsg() {"
+                        + "            let nameVar = document.getElementById(\"name\").value;"
+                        + "            const xhttp = new XMLHttpRequest();"
+                        + "            xhttp.onload = function() {"
+                        + "                document.getElementById(\"getrespmsg\").innerHTML ="
+                        + "                this.responseText;"
+                        + "            }"
+                        + "            xhttp.open(\"GET\", \"/hello?name=\"+nameVar);"
+                        + "            xhttp.send();"
+                        + "        }"
+                        + "    </script>"
+                        + ""
+                        + "    <h1>Form with POST</h1>"
+                        + "    <form action=\"/hellopost\">"
+                        + "        <label for=\"postname\">Name:</label><br>"
+                        + "        <input type=\"text\" id=\"postname\" name=\"name\" value=\"John\"><br><br>"
+                        + "        <input type=\"button\" value=\"Submit\" onclick=\"loadPostMsg(postname)\">"
+                        + "    </form>"
+                        + ""
+                        + "    <div id=\"postrespmsg\"></div>"
+                        + ""
+                        + "    <script>"
+                        + "        function loadPostMsg(name){"
+                        + "            let url = \"/hellopost?name=\" + name.value;"
+                        + ""
+                        + "            fetch (url, {method: 'POST'})"
+                        + "                .then(x => x.text())"
+                        + "                .then(y => document.getElementById(\"postrespmsg\").innerHTML = y);"
+                        + "        }"
+                        + "    </script>"
+                        + "    <h1>Image Example</h1>"
+                        + "    <img src=\"main/resources/image.png\" alt=\"Test Image\" width=\"300\">"
                         + "</body>"
                         + "</html>";
-
-                out.println(outputLine);
+                out.write(outputLine.getBytes());
             }
             out.close();
             in.close();
@@ -82,4 +143,3 @@ public class HttpServer {
         return response;
     }
 }
-

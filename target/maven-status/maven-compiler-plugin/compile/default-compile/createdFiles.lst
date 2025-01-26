@@ -1,0 +1,5 @@
+edu\escuelaing\app\EchoServer.class
+edu\escuelaing\app\EchoClient.class
+edu\escuelaing\app\HttpServer.class
+edu\escuelaing\app\URLParser.class
+edu\escuelaing\app\URLReader.class
