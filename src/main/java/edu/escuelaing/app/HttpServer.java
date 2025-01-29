@@ -2,6 +2,8 @@ package edu.escuelaing.app;
 
 import java.net.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class HttpServer {
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -33,7 +35,7 @@ public class HttpServer {
             String file = "";
 
             while ((inputLine = in.readLine()) != null) {
-                if(isFirstLine){
+                if (isFirstLine) {
                     file = inputLine.split(" ")[1];
                     isFirstLine = false;
                 }
@@ -43,35 +45,22 @@ public class HttpServer {
                     break;
                 }
             }
-            URI requestedFile = new URI(file);
+            File requestedFile = new File("src/main/resources/archivesPractice" + file);
+            if (requestedFile.exists() && requestedFile.isFile()) {
+                String contentType = determineContentType(file);
+                outputLine = "HTTP/1.1 200 OK\r\n"
+                        + "Content-Type: " + contentType + "\r\n"
+                        + "\r\n";
+                out.write(outputLine.getBytes());
 
-            System.out.println("file: " + requestedFile);
-
-            // Si se solicita una imagen
-            if(requestedFile.getPath().endsWith(".png")){
-                File imgFile = new File("src/main/resources/image.png");
-                if(imgFile.exists()) {
-                    outputLine = "HTTP/1.1 200 OK\r\n"
-                            + "Content-Type: image/png\r\n"  // Para image/png
-                            + "\r\n";
-                    out.write(outputLine.getBytes());
-
-                    FileInputStream imgInputStream = new FileInputStream(imgFile);
+                try (FileInputStream fileInputStream = new FileInputStream(requestedFile)) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
-                    while ((bytesRead = imgInputStream.read(buffer)) != -1) {
+                    while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                         out.write(buffer, 0, bytesRead);
                     }
-                    imgInputStream.close();
-                } else {
-                    outputLine = "HTTP/1.1 404 Not Found\r\n"
-                            + "Content-Type: text/html\r\n"
-                            + "\r\n"
-                            + "<html><body><h1>Image Not Found</h1></body></html>";
-                    out.write(outputLine.getBytes());
                 }
-            }
-            else {
+            } else {
                 outputLine = "HTTP/1.1 200 OK\r\n"
                         + "Content-Type: text/html\r\n" +
                         "\r\n" +
@@ -123,11 +112,12 @@ public class HttpServer {
                         + "        }"
                         + "    </script>"
                         + "    <h1>Image Example</h1>"
-                        + "    <img src=\"main/resources/image.png\" alt=\"Test Image\" width=\"300\">"
+                        + "    <img src=\"/image.png\" alt=\"Test Image\" width=\"300\">" // Ruta relativa
                         + "</body>"
                         + "</html>";
                 out.write(outputLine.getBytes());
             }
+
             out.close();
             in.close();
             clientSocket.close();
@@ -135,11 +125,19 @@ public class HttpServer {
         serverSocket.close();
     }
 
-    private static String helloRestService(String path, String query){
-        String response = "HTTP/1.1 200 OK\r\n"
-                +"Content-Type: application/json\r\n"
-                +"\r\n"
-                +"{\"name\": \"John\", \"age\":30, \"car\":null}";
-        return response;
+    private static String determineContentType(String file) {
+        if (file.endsWith(".png")) {
+            return "png";
+        } else if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
+            return "jpeg";
+        } else if (file.endsWith(".html")) {
+            return "html";
+        } else if (file.endsWith(".css")) {
+            return "css";
+        } else if (file.endsWith(".js")) {
+            return "javascript";
+        } else {
+            return "application/octet-stream";
+        }
     }
 }

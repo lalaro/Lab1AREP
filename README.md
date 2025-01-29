@@ -23,6 +23,15 @@ Estas instrucciones te permitirán obtener una copia del proyecto en funcionamie
 4. Escriba un servidor web que soporte multiples solicitudes seguidas (no concurrentes). El servidor debe retornar todos los archivos solicitados, incluyendo paginas html e imagenes.
    En la clase HTTPServer.java:
    ![image7.jpeg](src%2Fmain%2Fresources%2Fimage7.jpeg)
+   ![image8.jpeg](src%2Fmain%2Fresources%2Fimage8.jpeg)
+   ![image9.jpeg](src%2Fmain%2Fresources%2Fimage9.jpeg)
+   ![image10.jpeg](src%2Fmain%2Fresources%2Fimage10.jpeg)
+   ![image11.jpeg](src%2Fmain%2Fresources%2Fimage11.jpeg)
+   ![image12.jpeg](src%2Fmain%2Fresources%2Fimage12.jpeg)
+   ![image13.jpeg](src%2Fmain%2Fresources%2Fimage13.jpeg)
+   ![image14.jpeg](src%2Fmain%2Fresources%2Fimage14.jpeg)
+   ![image15.jpeg](src%2Fmain%2Fresources%2Fimage15.jpeg)
+   ![image16.jpeg](src%2Fmain%2Fresources%2Fimage16.jpeg)
 
 ### Prerrequisitos
 
