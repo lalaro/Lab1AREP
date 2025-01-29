@@ -22,11 +22,7 @@ Estas instrucciones te permitirán obtener una copia del proyecto en funcionamie
    ![image5.jpeg](src%2Fmain%2Fresources%2Fimage5.jpeg)
    ![image6.jpeg](src%2Fmain%2Fresources%2Fimage6.jpeg)
 
-3. 3.1. Escriba un servidor que reciba un numero y responda el cuadrado de este numero.
-   
-   3.2.Escriba un servidor que pueda recibir un numero y responda con un operacion sobre este numero. Este servidor puede recibir un mensaje que empiece por fun: , si recibe este mensaje cambia la operacion a las especi cada. El servidor debe responder las funciones seno, coseno y tangente. Por defecto debe empezar calculando el coseno. Por ejemplo, si el primer numero que recibe es 0, debe responder 1, si despues recibe 2 debe responder 0, si luego recibe fun:sin debe cambiar la operacion actual a seno, es decir a a partir de ese momento debe calcular senos. Si enseguida recibe 0 debe responder 0.
-
-4. Escriba un servidor web que soporte multiples solicitudes seguidas (no concurrentes). El servidor debe retornar todos los archivos solicitados, incluyendo paginas html e imagenes.
+3. Escriba un servidor web que soporte multiples solicitudes seguidas (no concurrentes). El servidor debe retornar todos los archivos solicitados, incluyendo paginas html e imagenes.
    
    En la clase HTTPServer.java:
 
@@ -74,10 +70,6 @@ Estas instrucciones te permitirán obtener una copia del proyecto en funcionamie
    Para otro tipo de archivo, se descargara localmente:
 
    ![image17.jpeg](src%2Fmain%2Fresources%2Fimage17.jpeg)
-
-5. Utilizando Datagramas escriba un programa que se conecte a un servidor que responde la hora actual en el servidor. El programa debe actualizar la hora cada 5 segundos segun los datos del servidor. Si una hora no es recibida debe mantener la hora que tena. Para la prueba se apagara el servidor y despues de unos segundos se reactivara. El cliente debe seguir funcionando y actualizarse cuando el servidor este nuevamente funcionando.
-
-6. CHAT: Utilizando RMI, escriba un aplicativo que pueda conectarse a otro aplicativo del mismo tipo en un servidor remoto para comenzar un chat. El aplicativo debe solicitar una direccion IP y un puerto antes de conectarse con el cliente que se desea. Igualmente, debe solicitar un puerto antes de iniciar para que publique el objeto que recibe los llamados remotos en dicho puerto.
 
 
 ### Prerrequisitos
