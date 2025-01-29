@@ -7,31 +7,74 @@ Escribir un servidor web que soporte múlltiples solicitudes seguidas no concurr
 Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas. Consulta la sección de despliegue para obtener notas sobre cómo implementar el proyecto en un sistema en vivo.
 
 1. Escriba un programa en el cual usted cree un objeto URL e imprima en pantalla cada uno de los datos que retornan los 8 metodos de la seccion anterior (getProtocol, getAuthority, getHost, getPort, getPath, getQuery, getFile, getRef.).
+   
    En la clase URLParser.java:
+   
    ![image1.jpeg](src%2Fmain%2Fresources%2Fimage1.jpeg)
    ![image2.jpeg](src%2Fmain%2Fresources%2Fimage2.jpeg)
 
 2. Escriba una aplicacion browser que pregunte una direccion URL al usuario y que lea datos de esa direccion y que los almacene en un archivo con el nombre resultado.html. Luego intente ver este archivo en el navegador.
+   
    En la clase URLReader.java:
+
    ![image3.jpeg](src%2Fmain%2Fresources%2Fimage3.jpeg)
    ![image4.jpeg](src%2Fmain%2Fresources%2Fimage4.jpeg)
    ![image5.jpeg](src%2Fmain%2Fresources%2Fimage5.jpeg)
    ![image6.jpeg](src%2Fmain%2Fresources%2Fimage6.jpeg)
+
 3. 3.1. Escriba un servidor que reciba un numero y responda el cuadrado de este numero.
+   
    3.2.Escriba un servidor que pueda recibir un numero y responda con un operacion sobre este numero. Este servidor puede recibir un mensaje que empiece por fun: , si recibe este mensaje cambia la operacion a las especi cada. El servidor debe responder las funciones seno, coseno y tangente. Por defecto debe empezar calculando el coseno. Por ejemplo, si el primer numero que recibe es 0, debe responder 1, si despues recibe 2 debe responder 0, si luego recibe fun:sin debe cambiar la operacion actual a seno, es decir a a partir de ese momento debe calcular senos. Si enseguida recibe 0 debe responder 0.
 
 4. Escriba un servidor web que soporte multiples solicitudes seguidas (no concurrentes). El servidor debe retornar todos los archivos solicitados, incluyendo paginas html e imagenes.
+   
    En la clase HTTPServer.java:
+
+   Vamos a correr el archivo en el puerto 35000, por ejemplo http://localhost:35000/ghl.html?vl=8&t=5
+   
    ![image7.jpeg](src%2Fmain%2Fresources%2Fimage7.jpeg)
+   
+   todos los archivos se van a ingresar o guardar por la ruta que se indica a continuación en requestedFile
+   
    ![image8.jpeg](src%2Fmain%2Fresources%2Fimage8.jpeg)
+   
+   El archivo predeterminado cada vez que se ingrese en el puerto será el siguiente: 
+   
    ![image9.jpeg](src%2Fmain%2Fresources%2Fimage9.jpeg)
    ![image10.jpeg](src%2Fmain%2Fresources%2Fimage10.jpeg)
+   
+   Para poder entender los formatos de archivos entonces, agregamos cada uno; según lo que se requiera. El archivo que no encuentre en nuestro formato debería poder descargarlo localmente.
+   
    ![image11.jpeg](src%2Fmain%2Fresources%2Fimage11.jpeg)
+
+   La pagina principal, se verá así inicialmente
+   
    ![image12.jpeg](src%2Fmain%2Fresources%2Fimage12.jpeg)
+
+   Para archivo html:
+
    ![image13.jpeg](src%2Fmain%2Fresources%2Fimage13.jpeg)
+
+   Para archivo css:
+   
    ![image14.jpeg](src%2Fmain%2Fresources%2Fimage14.jpeg)
+
+   Para archivo js:
+
    ![image15.jpeg](src%2Fmain%2Fresources%2Fimage15.jpeg)
+   
+   Para archivo png:
+
    ![image16.jpeg](src%2Fmain%2Fresources%2Fimage16.jpeg)
+
+   Para otro tipo de archivo, se descargara localmente:
+
+   ![image17.jpeg](src%2Fmain%2Fresources%2Fimage17.jpeg)
+
+5. Utilizando Datagramas escriba un programa que se conecte a un servidor que responde la hora actual en el servidor. El programa debe actualizar la hora cada 5 segundos segun los datos del servidor. Si una hora no es recibida debe mantener la hora que tena. Para la prueba se apagara el servidor y despues de unos segundos se reactivara. El cliente debe seguir funcionando y actualizarse cuando el servidor este nuevamente funcionando.
+
+6. CHAT: Utilizando RMI, escriba un aplicativo que pueda conectarse a otro aplicativo del mismo tipo en un servidor remoto para comenzar un chat. El aplicativo debe solicitar una direccion IP y un puerto antes de conectarse con el cliente que se desea. Igualmente, debe solicitar un puerto antes de iniciar para que publique el objeto que recibe los llamados remotos en dicho puerto.
+
 
 ### Prerrequisitos
 
