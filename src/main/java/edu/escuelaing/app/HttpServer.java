@@ -27,8 +27,8 @@ public class HttpServer {
             }
             OutputStream out = clientSocket.getOutputStream();
             BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            clientSocket.getInputStream()));
+                    new InputStreamReader(clientSocket.getInputStream())
+            );
             String inputLine, outputLine;
 
             boolean isFirstLine = true;
@@ -45,77 +45,14 @@ public class HttpServer {
                     break;
                 }
             }
-            File requestedFile = new File("src/main/resources/archivesPractice" + file);
-            if (requestedFile.exists() && requestedFile.isFile()) {
-                String contentType = determineContentType(file);
-                outputLine = "HTTP/1.1 200 OK\r\n"
-                        + "Content-Type: " + contentType + "\r\n"
-                        + "\r\n";
-                out.write(outputLine.getBytes());
 
-                try (FileInputStream fileInputStream = new FileInputStream(requestedFile)) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                        out.write(buffer, 0, bytesRead);
-                    }
-                }
+            if (file.equals("/") || file.equals("/paginanew")) {
+                serveStaticFiles("/archive1.html", out);
+            } else if (file.equals("/hello")) {
+                String response = helloRestService(file, "");
+                out.write(response.getBytes());
             } else {
-                outputLine = "HTTP/1.1 200 OK\r\n"
-                        + "Content-Type: text/html\r\n" +
-                        "\r\n" +
-                        "<!DOCTYPE html>"
-                        + "<html>"
-                        + "<head>"
-                        + "    <title>Form Example</title>"
-                        + "    <meta charset=\"UTF-8\">"
-                        + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-                        + "</head>"
-                        + "<body>"
-                        + "    <h1>Form with GET</h1>"
-                        + "    <form action=\"/hello\">"
-                        + "        <label for=\"name\">Name:</label><br>"
-                        + "        <input type=\"text\" id=\"name\" name=\"name\" value=\"John\"><br><br>"
-                        + "        <input type=\"button\" value=\"Submit\" onclick=\"loadGetMsg()\">"
-                        + "    </form> "
-                        + "    <div id=\"getrespmsg\"></div>"
-                        + ""
-                        + "    <script>"
-                        + "        function loadGetMsg() {"
-                        + "            let nameVar = document.getElementById(\"name\").value;"
-                        + "            const xhttp = new XMLHttpRequest();"
-                        + "            xhttp.onload = function() {"
-                        + "                document.getElementById(\"getrespmsg\").innerHTML ="
-                        + "                this.responseText;"
-                        + "            }"
-                        + "            xhttp.open(\"GET\", \"/hello?name=\"+nameVar);"
-                        + "            xhttp.send();"
-                        + "        }"
-                        + "    </script>"
-                        + ""
-                        + "    <h1>Form with POST</h1>"
-                        + "    <form action=\"/hellopost\">"
-                        + "        <label for=\"postname\">Name:</label><br>"
-                        + "        <input type=\"text\" id=\"postname\" name=\"name\" value=\"John\"><br><br>"
-                        + "        <input type=\"button\" value=\"Submit\" onclick=\"loadPostMsg(postname)\">"
-                        + "    </form>"
-                        + ""
-                        + "    <div id=\"postrespmsg\"></div>"
-                        + ""
-                        + "    <script>"
-                        + "        function loadPostMsg(name){"
-                        + "            let url = \"/hellopost?name=\" + name.value;"
-                        + ""
-                        + "            fetch (url, {method: 'POST'})"
-                        + "                .then(x => x.text())"
-                        + "                .then(y => document.getElementById(\"postrespmsg\").innerHTML = y);"
-                        + "        }"
-                        + "    </script>"
-                        + "    <h1>Image Example</h1>"
-                        + "    <img src=\"/image.png\" alt=\"Test Image\" width=\"300\">" // Ruta relativa
-                        + "</body>"
-                        + "</html>";
-                out.write(outputLine.getBytes());
+                serveStaticFiles(file, out);
             }
 
             out.close();
@@ -123,6 +60,80 @@ public class HttpServer {
             clientSocket.close();
         }
         serverSocket.close();
+    }
+
+    private static void serveStaticFiles(String filePath, OutputStream out) throws IOException {
+        File requestedFile = new File("src/main/resources/archivesPractice" + filePath);
+        String outputLine = "";
+        if (requestedFile.exists() && requestedFile.isFile()) {
+            String contentType = determineContentType(filePath);
+            String header = "HTTP/1.1 200 OK\r\n" +
+                    "Content-Type: " + contentType + "\r\n" +
+                    "\r\n";
+            out.write(header.getBytes());
+
+            try (FileInputStream fileInputStream = new FileInputStream(requestedFile)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+        } else {
+            outputLine = "HTTP/1.1 200 OK\r\n"
+                    + "Content-Type: text/html\r\n"+
+                    "\r\n" +
+                    "<!DOCTYPE html>"
+                    + "<html>"
+                    + "<head>"
+                    + "    <title>Form Example</title>"
+                    + "    <meta charset=\"UTF-8\">"
+                    + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+                    + "</head>"
+                    + "<body>"
+                    + "    <h1>Form with GET</h1>"
+                    + "    <form action=\"/hello\">"
+                    + "        <label for=\"name\">Name:</label><br>"
+                    + "        <input type=\"text\" id=\"name\" name=\"name\" value=\"John\"><br><br>"
+                    + "        <input type=\"button\" value=\"Submit\" onclick=\"loadGetMsg()\">"
+                    + "    </form> "
+                    + "    <div id=\"getrespmsg\"></div>"
+                    + ""
+                    + "    <script>"
+                    + "        function loadGetMsg() {"
+                    + "            let nameVar = document.getElementById(\"name\").value;"
+                    + "            const xhttp = new XMLHttpRequest();"
+                    + "            xhttp.onload = function() {"
+                    + "                document.getElementById(\"getrespmsg\").innerHTML ="
+                    + "                this.responseText;"
+                    + "            }"
+                    + "            xhttp.open(\"GET\", \"/hello?name=\"+nameVar);"
+                    + "            xhttp.send();"
+                    + "        }"
+                    + "    </script>"
+                    + ""
+                    + "    <h1>Form with POST</h1>"
+                    + "    <form action=\"/hellopost\">"
+                    + "        <label for=\"postname\">Name:</label><br>"
+                    + "        <input type=\"text\" id=\"postname\" name=\"name\" value=\"John\"><br><br>"
+                    + "        <input type=\"button\" value=\"Submit\" onclick=\"loadPostMsg(postname)\">"
+                    + "    </form>"
+                    + ""
+                    + "    <div id=\"postrespmsg\"></div>"
+                    + ""
+                    + "    <script>"
+                    + "        function loadPostMsg(name){"
+                    + "            let url = \"/hellopost?name=\" + name.value;"
+                    + ""
+                    + "            fetch (url, {method: 'POST'})"
+                    + "                .then(x => x.text())"
+                    + "                .then(y => document.getElementById(\"postrespmsg\").innerHTML = y);"
+                    + "        }"
+                    + "    </script>"
+                    + "</body>"
+                    + "</html>";
+            out.write(outputLine.getBytes());
+        }
     }
 
     private static String determineContentType(String file) {
@@ -137,7 +148,15 @@ public class HttpServer {
         } else if (file.endsWith(".js")) {
             return "javascript";
         } else {
-            return "application/octet-stream";
+            return "octet-stream";
         }
+    }
+
+    private static String helloRestService(String path, String query){
+        String response = "HTTP/1.1 200 OK\r\n"
+                + "Content-Type: application/json\r\n"
+                + "\r\n"
+                + "{\"name\": \"John\", \"age\":30, \"car\":null}";
+        return response;
     }
 }

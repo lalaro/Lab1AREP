@@ -1,24 +1,50 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
+  <title>Form Example</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doraemon Web</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="archive2.css">
 </head>
 <body>
-<h1>¡Bienvenido al mundo de Doraemon! 🏠</h1>
+<h1>Form with GET</h1>
+<form action="/hello">
+  <label for="name">Name:</label><br>
+  <input type="text" id="name" name="name" value="John"><br><br>
+  <input type="button" value="Submit" onclick="loadGetMsg()">
+</form>
+<div id="getrespmsg"></div>
 
-<img src="doraemon.png" alt="Doraemon" class="doraemon-img">
+<script>
+  function loadGetMsg() {
+      let nameVar = document.getElementById("name").value;
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+          document.getElementById("getrespmsg").innerHTML =
+          this.responseText;
+      }
+      xhttp.open("GET", "/hello?name="+nameVar);
+      xhttp.send();
+  }
+</script>
 
-<p>Escribe algo para Doraemon:</p>
-<input type="text" id="mensajeUsuario" placeholder="Hola Doraemon..." />
+<h1>Form with POST</h1>
+<form action="/hellopost">
+  <label for="postname">Name:</label><br>
+  <input type="text" id="postname" name="name" value="John"><br><br>
+  <input type="button" value="Submit" onclick="loadPostMsg(postname)">
+</form>
 
-<p>Haz clic en el botón para ver qué diría Doraemon:</p>
-<button onclick="mostrarFrase()">🎤 ¿Qué dirías, Doraemon?</button>
+<div id="postrespmsg"></div>
 
-<p id="frase"></p>
+<script>
+  function loadPostMsg(name){
+      let url = "/hellopost?name=" + name.value;
 
-<script src="script.js"></script>
+      fetch (url, {method: 'POST'})
+          .then(x => x.text())
+          .then(y => document.getElementById("postrespmsg").innerHTML = y);
+  }
+</script>
 </body>
 </html>

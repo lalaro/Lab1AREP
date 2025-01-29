@@ -37,6 +37,10 @@ Estas instrucciones te permitirán obtener una copia del proyecto en funcionamie
    todos los archivos se van a ingresar o guardar por la ruta que se indica a continuación en requestedFile
    
    ![image8.jpeg](src%2Fmain%2Fresources%2Fimage8.jpeg)
+
+   Se va tener la pagina inicial en paginanew
+
+   ![image8.1.jpeg](src%2Fmain%2Fresources%2Fimage8.1.jpeg)
    
    El archivo predeterminado cada vez que se ingrese en el puerto será el siguiente: 
    

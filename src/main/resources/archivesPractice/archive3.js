@@ -1,14 +1,19 @@
-function mostrarFrase() {
-    const mensaje = document.getElementById("mensajeUsuario").value;
-    const frases = [
-        "¡Nobitaaa! ¿Qué hiciste ahora? 😅",
-        "Siempre hay un gadget para todo. 🚀",
-        "Los amigos siempre están ahí para ayudar. ❤️",
-        "¡Vamos a viajar en el tiempo! ⏳",
-        "Confía en ti mismo, Nobita. 🌟"
-    ];
+function loadGetMsg() {
+    let nameVar = document.getElementById("name").value;
+    const xhttp = new XMLHttpRequest();
 
-    const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
+    xhttp.onload = function() {
+        document.getElementById("getrespmsg").innerHTML = this.responseText;
+    }
 
-    document.getElementById("frase").textContent = `"${mensaje}" - Doraemon responde: ${fraseAleatoria}`;
+    xhttp.open("GET", "/hello?name=" + nameVar);
+    xhttp.send();
+}
+
+function loadPostMsg(name) {
+    let url = "/hellopost?name=" + name.value;
+
+    fetch(url, {method: 'POST'})
+        .then(response => response.text())
+        .then(data => document.getElementById("postrespmsg").innerHTML = data);
 }
