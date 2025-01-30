@@ -12,6 +12,13 @@ Y luego revisar las intrucciones a continuación para el manejo de soluciones de
 
 El desarrollo del Laboratorio es el siguiente:
 
+Como arquitectura tenemos:
+
+![image22.jpeg](src%2Fmain%2Fresources%2Fimage22.jpeg)
+
+Como se muestra en la imagen el servidor HTTP escucha en el puerto 35000, que actúa como el punto de entrada único para todas las solicitudes del cliente (navegador). A través de este puerto, el servidor maneja tanto solicitudes de archivos estáticos (como GET de estilo css, html, js o imagen (png/jpeg)) como solicitudes al backend REST. Para las solicitudes de archivos estáticos, el servidor accede al sistema de archivos local, recupera el recurso y lo devuelve en la respuesta HTTP; para las solicitudes REST, el servidor redirige la petición al módulo backend, 
+el cual procesa la lógica y devuelve una respuesta en formato JSON, como {"message": "Hello"}. El usuario del servidor HTTP (navegador) solo interactúa con el puerto 35000, mientras que el backend REST opera internamente dentro del servidor HTTP, sin exponer un puerto adicional, centralizando así todas las comunicaciones en un único punto de entrada y simplificando la infraestructura.
+
 1. Escriba un programa en el cual usted cree un objeto URL e imprima en pantalla cada uno de los datos que retornan los 8 metodos de la seccion anterior (getProtocol, getAuthority, getHost, getPort, getPath, getQuery, getFile, getRef.).
    
    En la clase URLParser.java:
@@ -184,7 +191,7 @@ Por favor, lee [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b2467940295
 
 ## Versionado
 
-Usamos [SemVer](http://semver.org/) para el versionado. Para las versiones disponibles, consulta los [tags en este repositorio](https://github.com/your/project/tags).
+Usamos [SemVer](http://semver.org/) para el versionado.
 
 ## Autores
 
