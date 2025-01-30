@@ -1,48 +1,54 @@
 package edu.escuelaing.app;
+
 import java.io.*;
 import java.net.*;
 
 public class EchoServer {
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = null;
-        try {
-            // Crea un socket servidor en el puerto 35000
-            serverSocket = new ServerSocket(35000);
-        } catch (IOException e) {
-            System.err.println("Could not listen on port: 35000.");
-            System.exit(1);
-        }
 
-        Socket clientSocket = null;
-        try {
-            // Acepta una conexión de un cliente
-            clientSocket = serverSocket.accept();
-        } catch (IOException e) {
-            System.err.println("Accept failed.");
-            System.exit(1);
-        }
+    private static ServerSocket serverSocket;
+    private static boolean running = true;
 
-        // Crea streams para enviar y recibir datos
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(clientSocket.getInputStream()));
+    public static void start(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
+        System.out.println("Server is listening on port " + port);
 
-        String inputLine, outputLine;
+        while (running) {
+            try (Socket clientSocket = serverSocket.accept();
+                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-        // Bucle para recibir y enviar mensajes al cliente
-        while ((inputLine = in.readLine()) != null) {
-            System.out.println("Mensaje: " + inputLine);
-            outputLine = "Respuesta: " + inputLine;
-            out.println(outputLine);
-            if (outputLine.equals("Respuesta: Bye.")) {
-                break;
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    System.out.println("Received from client: " + inputLine);
+                    String outputLine = "Respuesta: " + inputLine;
+                    out.println(outputLine);
+
+                    if ("Bye.".equalsIgnoreCase(inputLine.trim())) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Error handling client connection: " + e.getMessage());
             }
         }
+    }
 
-        // Cierra todos los recursos
-        out.close();
-        in.close();
-        clientSocket.close();
-        serverSocket.close();
+    public static void stop() {
+        running = false;
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Error closing server socket: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        int port = 35000; // Puerto por defecto
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]); // Permite especificar un puerto personalizado
+        }
+        start(port);
     }
 }

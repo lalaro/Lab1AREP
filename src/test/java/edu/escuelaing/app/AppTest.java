@@ -1,22 +1,47 @@
 package edu.escuelaing.app;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+
+import java.io.*;
+import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class AppTest {
 
     private Map<String, String> mockResponses;
+    private static Thread serverThread;
+    private static int port;
+
+    @BeforeAll
+    public static void setUpServer() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            port = socket.getLocalPort();
+        }
+        serverThread = new Thread(() -> {
+            try {
+                EchoServer.start(port);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        serverThread.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @AfterAll
+    public static void tearDownServer() {
+        EchoServer.stop();
+        if (serverThread != null && serverThread.isAlive()) {
+            serverThread.interrupt();
+        }
+    }
 
     @BeforeEach
     public void setUp() {
@@ -62,9 +87,8 @@ public class AppTest {
         assertEquals(expected, actual, "Un recurso inexistente debe responder con 404.");
     }
 
-
     @Test
-    public void testServerResponseSimulation() throws IOException {
+    public void testServerResponseSimulation() {
         int mockResponseCode = 404;
         String expectedResponse = "404 Not Found";
         String actualResponse = (mockResponseCode == 404) ? expectedResponse : "200 OK";
@@ -73,7 +97,7 @@ public class AppTest {
     }
 
     @Test
-    public void testServerResponse200() throws IOException {
+    public void testServerResponse200() {
         int mockResponseCode = 200;
         String expectedResponse = "200 OK";
         String actualResponse = (mockResponseCode == 200) ? expectedResponse : "404 Not Found";
@@ -82,17 +106,16 @@ public class AppTest {
     }
 
     @Test
-    public void testServerResponse500() throws IOException {
+    public void testServerResponse500() {
         int mockResponseCode = 500;
         String expectedResponse = "500 Internal Server Error";
-
         String actualResponse = (mockResponseCode == 500) ? expectedResponse : "200 OK";
 
         assertEquals(expectedResponse, actualResponse, "Se esperaba una respuesta 500 del servidor.");
     }
 
     @Test
-    public void testServerResponse301() throws IOException {
+    public void testServerResponse301() {
         int mockResponseCode = 301;
         String expectedResponse = "301 Moved Permanently";
         String actualResponse = (mockResponseCode == 301) ? expectedResponse : "404 Not Found";
@@ -101,7 +124,7 @@ public class AppTest {
     }
 
     @Test
-    public void testServerResponse403() throws IOException {
+    public void testServerResponse403() {
         int mockResponseCode = 403;
         String expectedResponse = "403 Forbidden";
         String actualResponse = (mockResponseCode == 403) ? expectedResponse : "200 OK";
@@ -109,32 +132,21 @@ public class AppTest {
         assertEquals(expectedResponse, actualResponse, "Se esperaba una respuesta 403 del servidor.");
     }
 
-
     @Test
-    public void testEchoCommunication() throws IOException {
-        Thread serverThread = new Thread(() -> {
-            try {
-                EchoServer.main(new String[]{});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        serverThread.start();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+    public void testEchoCommunication() {
+        try (Socket clientSocket = new Socket("127.0.0.1", port);
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+
+            String messageToSend = "Hello Server";
+            out.println(messageToSend);
+            String response = in.readLine();
+
+            assertEquals("Respuesta: Hello Server", response, "El servidor debe responder con el mismo mensaje.");
+        } catch (IOException e) {
             e.printStackTrace();
+            fail("IOException ocurrió durante la comunicación con el servidor: " + e.getMessage());
         }
-        Socket clientSocket = new Socket("127.0.0.1", 35000);
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        String messageToSend = "Hello Server";
-        out.println(messageToSend);
-        String response = in.readLine();
-
-        assertEquals("Respuesta: Hello Server", response, "El servidor debe responder con el mismo mensaje.");
-        clientSocket.close();
     }
 
     @Test
@@ -150,4 +162,9 @@ public class AppTest {
         assertEquals("events", myurl.getRef(), "La referencia debería ser 'events'.");
     }
 
+    public void tearDown() {
+        if (serverThread != null && serverThread.isAlive()) {
+            serverThread.interrupt();
+        }
+    }
 }
